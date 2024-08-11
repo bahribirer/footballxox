@@ -1,6 +1,10 @@
+import csv
+from http.client import HTTPException
 from fastapi import APIRouter
 from functions import finalGrid, playerGuess, getISOCode
 from models import PlayerInfo
+from fastapi import Query
+
 
 router = APIRouter()
 
@@ -24,3 +28,21 @@ def club_logo(league_id: str, club_name: str):
 def get_ISO_code(country_name: str):
     code = getISOCode(country_name)
     return{"countryISO":code}
+
+@router.get("/player_names")
+def get_player_names(query: str = Query("")):
+    try:
+        matching_players = []
+        with open('players.csv', mode='r', encoding='utf-8') as file:
+            csv_reader = csv.DictReader(file)
+            for row in csv_reader:
+                player_name = row['name']  # Sütun adının 'name' olduğunu varsayıyoruz
+                if player_name.lower().startswith(query.lower()):
+                    matching_players.append(player_name)
+        return {"player_names": matching_players}
+    except UnicodeDecodeError as e:
+        print(f"Unicode decoding error: {e}")
+        raise HTTPException(status_code=500, detail="Unicode decoding error.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
