@@ -12,6 +12,12 @@ def final_grid(league_id: str):
     nations, clubs = finalGrid(league_id)
     return {"nations": nations, "clubs": clubs}
 
+
+@router.get("/replay_data/{league_id}")
+def replay_data(league_id: str):
+    nations, clubs = finalGrid(league_id)  # Yeni verileri alır
+    return {"nations": nations, "clubs": clubs}  # Yeni verileri döndürür
+
 @router.post("/guess_player/")
 def guess_player(player_info: PlayerInfo):
     answer = playerGuess(player_info.player_name, player_info.nationality, player_info.club)
